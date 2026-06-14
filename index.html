@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>USTC-Table-Mining 首页 | USTC-AGI</title>
+  <meta name="description" content="中国科学技术大学认知智能全国重点实验室 AGI 研究组：表格解析与识别、表格理解与推理、表格智能体、Spreadsheet Manipulation 与科学表格挖掘等方向介绍。" />
+  <meta name="theme-color" content="#f4fbf8" />
+  <meta name="application-name" content="USTC Table Mining" />
+  <meta name="apple-mobile-web-app-title" content="Table Mining" />
+  <meta property="og:title" content="USTC-Table-Mining 首页 | USTC-AGI" />
+  <meta property="og:description" content="Research on table parsing, table understanding, spreadsheet agents, and scientific table mining with temporal structure." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="asset/table_mark.svg" type="image/svg+xml" sizes="any" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC",
+                   "PingFang SC", "Hiragino Sans GB", sans-serif;
+      background: #f7f7f5;
+      color: #1a1a1a;
+      line-height: 1.8;
+      font-size: 16px;
+      text-align: justify;
+      text-justify: inter-ideograph;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: #0f766e; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 120;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e8e8e8;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    .top-nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 64px;
+    }
+    .nav-brand {
+      flex-shrink: 0;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #111;
+      white-space: nowrap;
+    }
+    .nav-brand span { color: #0f766e; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 0;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-links a,
+    .nav-dropdown-toggle {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #555;
+      transition: color .18s, background .18s, border-color .18s, transform .18s;
+    }
+    .nav-dropdown { position: relative; flex-shrink: 0; }
+    .nav-dropdown-toggle {
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.2;
+    }
+    .nav-dropdown-toggle::after {
+      content: "";
+      display: inline-block;
+      margin-left: 7px;
+      vertical-align: middle;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid currentColor;
+      transition: transform .18s ease;
+    }
+    .nav-dropdown.open .nav-dropdown-toggle::after { transform: rotate(180deg); }
+    .nav-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 238px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #d9eee9;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 12px 28px rgba(15, 118, 110, 0.10);
+      display: none;
+      gap: 4px;
+      z-index: 30;
+    }
+    .nav-dropdown.open .nav-dropdown-menu { display: grid; }
+    .nav-dropdown-menu a {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #555;
+      line-height: 1.4;
+    }
+    .nav-links a:hover,
+    .nav-links a:active,
+    .nav-dropdown-toggle:hover,
+    .nav-dropdown-toggle:active,
+    .nav-dropdown.open .nav-dropdown-toggle,
+    .nav-dropdown-menu a:hover,
+    .nav-dropdown-menu a:active {
+      color: #0f766e;
+      background: #f0fdf9;
+      border-color: #99e6d8;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+    .nav-active {
+      color: #0f766e !important;
+      background: #f0fdf9 !important;
+      border-color: #99e6d8 !important;
+      font-weight: 800 !important;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        linear-gradient(90deg, rgba(15, 118, 110, 0.055) 1px, transparent 1px) 0 0 / 42px 42px,
+        linear-gradient(180deg, rgba(232, 138, 26, 0.050) 1px, transparent 1px) 0 0 / 42px 42px,
+        linear-gradient(160deg, #ffffff 40%, #f4fffc 76%, #fff9ef 100%);
+      border-bottom: 1px solid #e8e8e8;
+      padding: 66px 0 58px;
+      text-align: center;
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease, opacity .2s ease;
+    }
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(110deg, transparent 0 18%, rgba(16, 16, 16, 0.035) 18% 18.4%, transparent 18.4% 32%),
+        linear-gradient(110deg, transparent 0 52%, rgba(15, 118, 110, 0.10) 52% 52.4%, transparent 52.4% 100%),
+        radial-gradient(circle at 78% 24%, rgba(232, 138, 26, 0.12), transparent 24%);
+      opacity: 0.76;
+      pointer-events: none;
+    }
+    header:hover {
+      background:
+        linear-gradient(90deg, rgba(15, 118, 110, 0.065) 1px, transparent 1px) 0 0 / 42px 42px,
+        linear-gradient(180deg, rgba(232, 138, 26, 0.065) 1px, transparent 1px) 0 0 / 42px 42px,
+        linear-gradient(160deg, #fdffff 40%, #ecfbf8 76%, #fff6e8 100%);
+    }
+    header.is-refreshing { transform: scale(0.995); opacity: 0.82; }
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      color: #0f766e;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+    .hero-logo {
+      display: block;
+      width: min(430px, 78vw);
+      height: auto;
+      margin: 0 auto 22px;
+      filter: drop-shadow(0 10px 24px rgba(15, 118, 110, 0.12));
+    }
+    header h1 {
+      max-width: 900px;
+      margin: 0 auto;
+      font-size: 2.22rem;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #111;
+      letter-spacing: 0;
+      text-align: center;
+      text-wrap: balance;
+      overflow-wrap: anywhere;
+    }
+    header h1 .highlight { color: #0f766e; }
+    header .header-sub {
+      max-width: 780px;
+      margin: 14px auto 0;
+      font-size: 0.97rem;
+      color: #666;
+      line-height: 1.75;
+      text-align: center;
+      text-justify: auto;
+    }
+    header .header-motto {
+      max-width: 920px;
+      margin: 14px auto 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f766e;
+      line-height: 1.8;
+      text-align: center;
+      text-justify: auto;
+    }
+    .hero-track-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 22px;
+    }
+    .hero-track-row span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 11px;
+      border: 1px solid #c9ebe6;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      color: #315a55;
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.35;
+      box-shadow: 0 4px 14px rgba(15, 118, 110, 0.05);
+    }
+    .hero-track-row span:nth-child(2n) {
+      border-color: #f2d3a9;
+      color: #684514;
+      box-shadow: 0 4px 14px rgba(232, 138, 26, 0.06);
+    }
+
+    main {
+      flex: 1;
+      padding: 40px 0 80px;
+    }
+    .section-intro {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .section-intro h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #111;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .section-intro p {
+      max-width: 920px;
+      margin: 0 auto;
+      font-size: 0.97rem;
+      color: #555;
+      text-align: center;
+      text-justify: auto;
+    }
+    .section-anchor { scroll-margin-top: 92px; }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .project-card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      scroll-margin-top: 92px;
+      padding: 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      transition: transform .22s, box-shadow .22s, border-color .22s, background .22s;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      overflow: hidden;
+    }
+    .project-card:hover,
+    .project-card:active {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 36px rgba(15, 118, 110, 0.08);
+      border-color: #cdeee7;
+      background: #fcfffe;
+      text-decoration: none;
+    }
+    .project-card-wide { grid-column: span 2; }
+    .card-accent {
+      height: 4px;
+      width: 100%;
+      flex-shrink: 0;
+      background: linear-gradient(90deg, #101010, #0f766e, #e88a1a);
+    }
+    .accent-amber { background: linear-gradient(90deg, #101010, #e88a1a, #0f766e); }
+    .accent-dark { background: linear-gradient(90deg, #101010, #3a3a3a, #0f766e); }
+    .card-body {
+      padding: 26px 26px 24px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .project-card h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #111;
+      margin-bottom: 10px;
+      line-height: 1.3;
+      text-align: left;
+    }
+    .card-desc {
+      font-size: 0.92rem;
+      color: #555;
+      line-height: 1.75;
+      margin-bottom: 20px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+      flex: 1;
+    }
+    .feature-grid-balanced { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .feature-panel {
+      min-height: 100%;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #c2e8e3;
+      background: linear-gradient(180deg, #fbfefe 0%, #f2fdfb 100%);
+    }
+    .feature-panel:nth-child(2n) {
+      border-color: #f1d6ac;
+      background: linear-gradient(180deg, #fffefd 0%, #fff8ee 100%);
+    }
+    .feature-label {
+      display: inline-flex;
+      align-self: flex-start;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #99e6d8;
+      background: #e6fbf7;
+      color: #0f766e;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      line-height: 1.35;
+    }
+    .feature-panel:nth-child(2n) .feature-label {
+      border-color: #efca8f;
+      background: #fff1dc;
+      color: #7a4c08;
+    }
+    .feature-body {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .feature-icon {
+      flex-shrink: 0;
+      width: 24px;
+      line-height: 1.2;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 2px;
+    }
+    .feature-desc {
+      font-size: 0.84rem;
+      color: #3d6860;
+      line-height: 1.75;
+    }
+    .feature-panel:nth-child(2n) .feature-desc { color: #684514; }
+
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 22px;
+      flex: 1;
+    }
+    .meta-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.84rem;
+      color: #444;
+      background: #f9f9f8;
+      border-radius: 8px;
+      padding: 8px 12px;
+      border: 1px solid #f0f0ee;
+    }
+    .meta-icon {
+      width: 22px;
+      text-align: center;
+      font-size: 0.96rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .card-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+      border-top: 1px solid #f0f0f0;
+      margin-top: 4px;
+    }
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 38px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      border: 1.5px solid transparent;
+      transition: transform .16s, box-shadow .16s, background .16s, border-color .16s, color .16s;
+      text-decoration: none;
+      line-height: 1.35;
+    }
+    .card-btn:hover,
+    .card-btn:active {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(15, 118, 110, 0.10);
+      background: #f0fdf9;
+      border-color: #99e6d8;
+      color: #0f766e;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: #0f766e;
+      color: #fff;
+      border-color: #0f766e;
+    }
+    .btn-primary:hover,
+    .btn-primary:active {
+      background: #f0fdf9;
+      border-color: #99e6d8;
+      color: #0f766e;
+    }
+    .btn-outline { background: #fff; color: #444; border-color: #d8d8d8; }
+    .btn-outline:hover,
+    .btn-outline:active { background: #f0fdf9; border-color: #99e6d8; color: #0f766e; }
+    .btn-disabled {
+      opacity: 0.72;
+      pointer-events: none;
+      cursor: default;
+    }
+    .divider {
+      margin: 56px 0 40px;
+      border: none;
+      border-top: 1px solid #e8e8e8;
+    }
+    footer {
+      background: #1c1c1c;
+      color: #999;
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 0.84rem;
+    }
+    footer p {
+      text-align: center;
+      text-justify: auto;
+    }
+    footer a { color: #5ecfc6; }
+    footer .footer-funding {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .top-nav .container {
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px;
+        padding-top: 10px;
+        padding-bottom: 8px;
+      }
+      .nav-brand { white-space: normal; }
+      .nav-links {
+        width: calc(100% + 32px);
+        margin: 0 -16px;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 0 16px 6px;
+      }
+      .nav-links a,
+      .nav-dropdown-toggle {
+        padding: 7px 12px;
+        font-size: 0.81rem;
+      }
+      .nav-dropdown-menu {
+        left: 0;
+        min-width: 220px;
+      }
+      header { padding: 44px 0 42px; }
+      .hero-kicker {
+        margin-bottom: 12px;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+      }
+      .hero-logo {
+        width: min(340px, 86vw);
+        margin-bottom: 18px;
+      }
+      header h1 {
+        max-width: 13em;
+        font-size: 1.66rem;
+        line-height: 1.22;
+      }
+      header h1 .highlight,
+      .hero-title-cn { display: block; }
+      header .header-sub {
+        font-size: 0.94rem;
+        line-height: 1.72;
+      }
+      header .header-motto {
+        font-size: 0.98rem;
+        line-height: 1.75;
+      }
+      .hero-track-row {
+        flex-wrap: wrap;
+        justify-content: center;
+        overflow-x: visible;
+      }
+      .project-grid { grid-template-columns: 1fr; }
+      .project-card-wide { grid-column: auto; }
+      .feature-grid,
+      .feature-grid-balanced { grid-template-columns: 1fr; }
+      main { padding: 40px 0 60px; }
+      .container { padding: 0 16px; }
+      .card-body { padding: 22px 18px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav" aria-label="首页顶部导航">
+  <div class="container">
+    <a class="nav-brand" href="index.html" aria-label="刷新页面">USTC-AGI <span>Table Mining</span></a>
+    <div class="nav-links">
+      <a class="nav-active" href="#hero-header" aria-current="page">首页</a>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-toggle" type="button" aria-expanded="false">研究方向</button>
+        <div class="nav-dropdown-menu" role="menu">
+          <a href="#table-parsing" role="menuitem">表格解析与识别</a>
+          <a href="#table-reasoning" role="menuitem">表格理解与推理</a>
+          <a href="#spreadsheet-agent" role="menuitem">表格智能体</a>
+          <a href="#scientific-table-mining" role="menuitem">科学表格挖掘</a>
+        </div>
+      </div>
+      <a href="#application-systems">应用研究</a>
+      <a href="#open-source-projects">开放资源</a>
+      <a href="#contact">联系</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero-header" role="button" tabindex="0" aria-label="刷新当前页面">
+  <div class="container">
+    <p class="hero-kicker">USTC-AGI Research Group</p>
+    <img class="hero-logo" src="asset/table_logo.svg" alt="USTC Table Mining Logo" />
+    <h1><span class="highlight">USTC-Table-Mining</span> <span class="hero-title-cn">首页</span></h1>
+    <p class="header-sub">
+      My research explores how LLMs and Agentic AI can transform table mining from recognizing complex tables, understanding their semantics, and manipulating spreadsheets into reasoning-driven intelligence for scientific and temporal tabular data.
+    </p>
+    <p class="header-motto">
+      以解析识别为入口，以理解推理为核心，以表格智能体为工具，以科学时序表格为牵引，连接复杂表格、实验数据与可信发现。
+    </p>
+    <div class="hero-track-row" aria-label="研究方向覆盖范围">
+      <span>Table Parsing</span>
+      <span>Table Reasoning</span>
+      <span>Spreadsheet Agents</span>
+      <span>Scientific Tables</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <div class="section-intro section-anchor" id="research-tracks">
+      <h2>研究方向</h2>
+      <p>USTC-AGI 研究组在 Table Mining 方向重点关注复杂表格的解析与识别、表格语义理解与多步推理、面向电子表格操作的智能体系统，以及科学领域中带有时序、实验和多源观测特性的表格挖掘任务。</p>
+    </div>
+
+    <div class="project-grid">
+      <section class="project-card project-card-wide section-anchor" id="table-parsing">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <h3>表格解析与识别</h3>
+          <p class="card-desc">
+            面向论文 PDF、扫描文档、网页、报告和电子表格中的复杂表格，研究从视觉版面、OCR 文本、单元格结构到逻辑表头的端到端解析与识别，让模型能够把非结构化或半结构化表格恢复为可计算、可追踪、可推理的数据对象。
+          </p>
+          <div class="feature-grid">
+            <div class="feature-panel">
+              <span class="feature-label">版面与表格检测</span>
+              <div class="feature-body">
+                <span class="feature-icon">▦</span>
+                <p class="feature-desc">识别文档中的表格区域、标题、注释、跨页延续和图表邻接关系，建立表格在原始文档中的证据位置。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">结构恢复</span>
+              <div class="feature-body">
+                <span class="feature-icon">↔</span>
+                <p class="feature-desc">恢复行列边界、合并单元格、层级表头、嵌套表格和多级索引，得到可用于计算的规范表结构。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">文本与数值识别</span>
+              <div class="feature-body">
+                <span class="feature-icon">✦</span>
+                <p class="feature-desc">结合 OCR、语言模型和数值校验识别单元格内容，处理单位、上下标、科学计数法和公式表达。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">多模态证据对齐</span>
+              <div class="feature-body">
+                <span class="feature-icon">⌁</span>
+                <p class="feature-desc">将表格与正文、图、公式、实验条件和参考文献对齐，为后续理解与推理保留可验证上下文。</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-links">
+            <a class="card-btn btn-primary" href="#open-source-projects">查看资源</a>
+            <span class="card-btn btn-outline btn-disabled">Parsing Benchmark Coming Soon</span>
+            <span class="card-btn btn-outline btn-disabled">Scientific PDF Tables Coming Soon</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="project-card section-anchor" id="table-reasoning">
+        <div class="card-accent accent-amber"></div>
+        <div class="card-body">
+          <h3>表格理解与推理</h3>
+          <p class="card-desc">
+            表格理解不仅是读取单元格，还需要理解层级表头、单位、实体、约束、上下文和隐含计算关系。该方向研究模型如何围绕表格开展问答、比较、归纳、计算、证据定位和跨表推理。
+          </p>
+          <div class="card-meta">
+            <div class="meta-row">
+              <span class="meta-icon">▣</span>
+              <span>表格问答 · 事实核验 · 多步计算 · 单元格证据定位</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">◈</span>
+              <span>Schema 理解 · 层级表头推理 · 单位换算 · 条件过滤与聚合</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">◎</span>
+              <span>跨表关联 · 图表文本联合推理 · 可解释推理链</span>
+            </div>
+          </div>
+          <div class="card-links">
+            <a class="card-btn btn-primary" href="#scientific-table-mining">科学表格任务</a>
+            <span class="card-btn btn-outline btn-disabled">Reasoning Benchmark Coming Soon</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="project-card section-anchor" id="spreadsheet-agent">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <h3>表格智能体与 Spreadsheet Manipulation</h3>
+          <p class="card-desc">
+            面向 Excel、Google Sheets、CSV 工作簿和数据库表，研究能够理解用户意图、操作电子表格、生成公式、清洗数据、构造图表并验证结果的表格智能体。
+          </p>
+          <div class="card-meta">
+            <div class="meta-row">
+              <span class="meta-icon">⌘</span>
+              <span>Spreadsheet Manipulation · 公式生成 · 单元格编辑 · 多工作表联动</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">▧</span>
+              <span>自动清洗 · 透视表 · 图表生成 · 数据校验 · 报告生成</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">◇</span>
+              <span>任务规划 · 工具调用 · 执行反馈 · 人机协同修正</span>
+            </div>
+          </div>
+          <div class="card-links">
+            <a class="card-btn btn-primary" href="#open-source-projects">查看规划</a>
+            <span class="card-btn btn-outline btn-disabled">Spreadsheet Agent Coming Soon</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="project-card project-card-wide section-anchor" id="scientific-table-mining">
+        <div class="card-accent accent-dark"></div>
+        <div class="card-body">
+          <h3>科学表格挖掘与时序表格数据</h3>
+          <p class="card-desc">
+            科学论文、实验记录、观测台站和仿真平台中包含大量表格数据，其中许多表格天然带有时间索引、实验阶段、观测窗口、纵向随访或动态过程。该方向研究如何从科学表格中抽取结构化知识，建模表格中的时序特性，并支持跨论文、跨实验、跨模态的科学发现。
+          </p>
+          <div class="feature-grid feature-grid-balanced">
+            <div class="feature-panel">
+              <span class="feature-label">科学文献表格抽取</span>
+              <div class="feature-body">
+                <span class="feature-icon">✓</span>
+                <p class="feature-desc">从论文、报告和实验附件中抽取材料、药物、基因、气象、能源和物理实验等科学表格。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">时序表格建模</span>
+              <div class="feature-body">
+                <span class="feature-icon">↯</span>
+                <p class="feature-desc">处理带时间列、阶段列、观测窗口和不规则采样的表格，连接表格挖掘与时间序列预测、趋势分析和异常发现。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">实验上下文推理</span>
+              <div class="feature-body">
+                <span class="feature-icon">◌</span>
+                <p class="feature-desc">结合实验条件、单位、仪器参数、样本批次和正文描述，推理观测结果变化背后的科学因素。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">跨表科学知识发现</span>
+              <div class="feature-body">
+                <span class="feature-icon">≋</span>
+                <p class="feature-desc">对齐不同论文、数据集和实验平台中的表格字段，发现可复用规律、候选假设和潜在反例。</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-links">
+            <a class="card-btn btn-primary" href="#contact">合作交流</a>
+            <span class="card-btn btn-outline btn-disabled">Scientific Table Corpus Coming Soon</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="section-intro section-anchor" id="application-systems">
+      <h2>应用研究</h2>
+      <p>围绕科研论文、实验记录、电子表格办公和真实业务数据分析等表格场景，沉淀从表格解析、理解推理到智能体操作的端到端能力。</p>
+    </div>
+
+    <div class="project-grid">
+      <section class="project-card project-card-wide">
+        <div class="card-accent accent-amber"></div>
+        <div class="card-body">
+          <h3>科学与办公场景中的表格智能</h3>
+          <p class="card-desc">
+            真实表格任务通常同时包含文档版面、领域术语、单位系统、计算规则和动态过程。我们关注如何把这些上下文转化为模型可利用的证据，让表格挖掘从单次离线建模走向可交互、可验证、可持续更新的智能分析。
+          </p>
+          <div class="feature-grid">
+            <div class="feature-panel">
+              <span class="feature-label">论文表格解析</span>
+              <div class="feature-body">
+                <span class="feature-icon">□</span>
+                <p class="feature-desc">从科学论文和技术报告中识别表格、恢复结构、抽取单位和实验条件，形成可复用科学数据资产。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">时序科学表格</span>
+              <div class="feature-body">
+                <span class="feature-icon">↗</span>
+                <p class="feature-desc">处理长期观测、实验进程、临床随访、气象能源和传感器记录等带时间维度的表格数据。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">Spreadsheet 办公自动化</span>
+              <div class="feature-body">
+                <span class="feature-icon">▣</span>
+                <p class="feature-desc">面向工作簿整理、公式修复、图表生成、透视分析和批量数据校验，构建可控的表格操作智能体。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">实验数据治理</span>
+              <div class="feature-body">
+                <span class="feature-icon">⚙</span>
+                <p class="feature-desc">面向实验批次、仪器参数、缺失记录、异常值和口径不一致问题，构建可追溯的数据清洗与质量诊断流程。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">跨论文知识整合</span>
+              <div class="feature-body">
+                <span class="feature-icon">∑</span>
+                <p class="feature-desc">对齐不同论文和数据库中的字段、实体、单位和指标，支持 meta-analysis、规律归纳和候选假设生成。</p>
+              </div>
+            </div>
+            <div class="feature-panel">
+              <span class="feature-label">决策与发现支持</span>
+              <div class="feature-body">
+                <span class="feature-icon">§</span>
+                <p class="feature-desc">通过可解释推理链和可复现实验流程，把表格证据转化为预测、比较、诊断和科学发现建议。</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-links">
+            <a class="card-btn btn-primary" href="#contact">发起合作</a>
+            <span class="card-btn btn-outline btn-disabled">Case Studies Coming Soon</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="section-intro section-anchor" id="open-source-projects">
+      <h2>开放资源</h2>
+      <p>围绕表格解析、表格推理、Spreadsheet Manipulation、科学表格挖掘和时序表格任务，逐步沉淀可复用的数据、工具与评测基础设施。</p>
+    </div>
+
+    <div class="project-grid">
+      <section class="project-card">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <h3>Scientific Table Mining Benchmark</h3>
+          <p class="card-desc">
+            面向科学文献表格解析、表格理解推理、跨表知识整合和带时序特性的科学表格建模，建设统一评测入口，支持多场景、多指标和多模型能力对齐。
+          </p>
+          <div class="card-meta">
+            <div class="meta-row">
+              <span class="meta-icon">▤</span>
+              <span>论文表格解析 · 结构恢复 · 单元格证据定位</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">▥</span>
+              <span>表格问答 · 多步推理 · 单位换算 · 跨表对齐</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">▨</span>
+              <span>时序科学表格 · 趋势预测 · 异常发现 · 实验阶段推理</span>
+            </div>
+          </div>
+          <div class="card-links">
+            <span class="card-btn btn-outline btn-disabled">Coming Soon</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="project-card">
+        <div class="card-accent accent-dark"></div>
+        <div class="card-body">
+          <h3>Spreadsheet Agent Lab</h3>
+          <p class="card-desc">
+            面向电子表格操作和表格数据科学工作流的智能体实验台，将表格理解、公式生成、单元格编辑、质量诊断、建模评估和报告生成整合为可交互闭环。
+          </p>
+          <div class="card-meta">
+            <div class="meta-row">
+              <span class="meta-icon">⌬</span>
+              <span>Planner · Spreadsheet Operator · Analyst · Critic 多角色协同</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">⌑</span>
+              <span>Excel / Sheets / Python / SQL 工具调用 · 受控执行 · 证据追踪</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">⌖</span>
+              <span>面向真实电子表格任务的人机协同操作与分析工作台</span>
+            </div>
+          </div>
+          <div class="card-links">
+            <span class="card-btn btn-outline btn-disabled">Coming Soon</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<footer id="contact">
+  <div class="container">
+    <p>
+      &copy; 2024-2026 USTC Table Mining Group &middot;
+      <a href="https://ustcagi.github.io/" target="_blank" rel="noopener">USTC-AGI 研究组</a>
+      &middot; State Key Laboratory of Cognitive Intelligence, USTC
+    </p>
+    <p class="footer-funding">
+      Research on table parsing, table reasoning, spreadsheet agents, scientific table mining, and temporal tabular data.
+    </p>
+  </div>
+</footer>
+
+<script>
+  (() => {
+    const dropdowns = document.querySelectorAll('.nav-dropdown');
+    const closeAll = () => {
+      dropdowns.forEach((dropdown) => {
+        dropdown.classList.remove('open');
+        const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+      });
+    };
+
+    dropdowns.forEach((dropdown) => {
+      const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+      const menuLinks = dropdown.querySelectorAll('.nav-dropdown-menu a');
+      if (!toggle) return;
+
+      toggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const willOpen = !dropdown.classList.contains('open');
+        closeAll();
+        dropdown.classList.toggle('open', willOpen);
+        toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      });
+
+      menuLinks.forEach((link) => {
+        link.addEventListener('click', closeAll);
+      });
+    });
+
+    document.addEventListener('click', closeAll);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeAll();
+    });
+
+    const heroHeader = document.querySelector('#hero-header');
+    const navBrand = document.querySelector('.nav-brand');
+    const refreshPage = () => {
+      if (!heroHeader || heroHeader.classList.contains('is-refreshing')) return;
+      heroHeader.classList.add('is-refreshing');
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 160);
+    };
+
+    if (heroHeader) {
+      heroHeader.addEventListener('click', refreshPage);
+      heroHeader.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        refreshPage();
+      });
+    }
+
+    if (navBrand) {
+      navBrand.addEventListener('click', (event) => {
+        event.preventDefault();
+        refreshPage();
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

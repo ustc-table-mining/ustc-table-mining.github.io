@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">USTC Table Mining mark</title>
+  <desc id="desc">Square mark with a table grid, connected cells, and TM initials.</desc>
+  <defs>
+    <linearGradient id="mark-bg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f1fbf8"/>
+    </linearGradient>
+    <linearGradient id="mark-accent" x1="14" y1="45" x2="50" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#e88a1a"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#mark-bg)" stroke="#0f766e" stroke-width="3"/>
+  <path d="M17 17H47M17 28H47M17 39H47M17 17V43M27 17V43M37 17V43M47 17V43" fill="none" stroke="#202020" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M21 38L31 27L40 31L47 20" fill="none" stroke="url(#mark-accent)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="21" cy="38" r="3.5" fill="#ffffff" stroke="#0f766e" stroke-width="2.3"/>
+  <circle cx="31" cy="27" r="3.5" fill="#ffffff" stroke="#0f766e" stroke-width="2.3"/>
+  <circle cx="40" cy="31" r="3.5" fill="#ffffff" stroke="#e88a1a" stroke-width="2.3"/>
+  <circle cx="47" cy="20" r="3.5" fill="#ffffff" stroke="#e88a1a" stroke-width="2.3"/>
+  <text x="13" y="56" fill="#0f766e" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="0">TM</text>
+</svg>
