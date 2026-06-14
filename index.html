@@ -510,12 +510,12 @@
       }
       .nav-brand { white-space: normal; }
       .nav-links {
-        width: calc(100% + 32px);
-        margin: 0 -16px;
+        width: 100%;
+        margin: 0;
         justify-content: flex-start;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding: 0 16px 6px;
+        flex-wrap: wrap;
+        overflow-x: visible;
+        padding: 0 0 6px;
       }
       .nav-links a,
       .nav-dropdown-toggle {
@@ -578,7 +578,6 @@
         <div class="nav-dropdown-menu" role="menu">
           <a href="#table-parsing" role="menuitem">表格解析与识别</a>
           <a href="#table-reasoning" role="menuitem">表格理解与推理</a>
-          <a href="#scientific-table-mining" role="menuitem">科学表格挖掘</a>
         </div>
       </div>
       <a href="#application-systems">应用研究</a>
@@ -614,7 +613,7 @@
 
     <div class="section-intro section-anchor" id="research-tracks">
       <h2>研究方向</h2>
-      <p>USTC-AGI 研究组在 Table Mining 方向重点关注复杂表格的解析与识别、表格语义理解与多步推理，以及科学表格数据中的实验观测、跨表对齐和时序建模问题。</p>
+      <p>USTC-AGI 研究组在 Table Mining 方向重点关注复杂表格的解析与识别、表格语义理解与多步推理，并面向科学表格数据与办公表格数据两类场景沉淀可复用能力。</p>
     </div>
 
     <div class="project-grid">
@@ -685,52 +684,8 @@
             </div>
           </div>
           <div class="card-links">
-            <a class="card-btn btn-primary" href="#scientific-table-mining">科学表格任务</a>
+            <a class="card-btn btn-primary" href="#application-systems">应用场景</a>
             <span class="card-btn btn-outline btn-disabled">Reasoning Benchmark Coming Soon</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="project-card project-card-wide section-anchor" id="scientific-table-mining">
-        <div class="card-accent accent-dark"></div>
-        <div class="card-body">
-          <h3>科学表格挖掘与时序表格数据</h3>
-          <p class="card-desc">
-            科学表格数据主要来自论文、实验记录、观测台站和仿真平台，承载材料、药物、基因、气象、能源和物理实验等科学对象。其中许多表格天然带有时间索引、实验阶段、观测窗口、纵向随访或动态过程。该方向研究如何从科学表格中抽取结构化知识，建模表格中的时序特性，并支持跨论文、跨实验、跨模态的科学发现。
-          </p>
-          <div class="feature-grid feature-grid-balanced">
-            <div class="feature-panel">
-              <span class="feature-label">科学文献表格抽取</span>
-              <div class="feature-body">
-                <span class="feature-icon">✓</span>
-                <p class="feature-desc">从论文、报告和实验附件中抽取材料、药物、基因、气象、能源和物理实验等科学表格。</p>
-              </div>
-            </div>
-            <div class="feature-panel">
-              <span class="feature-label">时序表格建模</span>
-              <div class="feature-body">
-                <span class="feature-icon">↯</span>
-                <p class="feature-desc">处理带时间列、阶段列、观测窗口和不规则采样的表格，连接表格挖掘与时间序列预测、趋势分析和异常发现。</p>
-              </div>
-            </div>
-            <div class="feature-panel">
-              <span class="feature-label">实验上下文推理</span>
-              <div class="feature-body">
-                <span class="feature-icon">◌</span>
-                <p class="feature-desc">结合实验条件、单位、仪器参数、样本批次和正文描述，推理观测结果变化背后的科学因素。</p>
-              </div>
-            </div>
-            <div class="feature-panel">
-              <span class="feature-label">跨表科学知识发现</span>
-              <div class="feature-body">
-                <span class="feature-icon">≋</span>
-                <p class="feature-desc">对齐不同论文、数据集和实验平台中的表格字段，发现可复用规律、候选假设和潜在反例。</p>
-              </div>
-            </div>
-          </div>
-          <div class="card-links">
-            <a class="card-btn btn-primary" href="#contact">合作交流</a>
-            <span class="card-btn btn-outline btn-disabled">Scientific Table Corpus Coming Soon</span>
           </div>
         </div>
       </section>
@@ -796,7 +751,7 @@
             </div>
           </div>
           <div class="card-links">
-            <a class="card-btn btn-primary" href="#scientific-table-mining">科学表格方向</a>
+            <a class="card-btn btn-primary" href="#open-source-projects">科学表格方向</a>
             <a class="card-btn btn-outline" href="#spreadsheet-agent">办公表格方向</a>
           </div>
         </div>
