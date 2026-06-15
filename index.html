@@ -387,6 +387,40 @@
       flex-shrink: 0;
       margin-top: 1px;
     }
+    .flow-core {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+      padding: 18px 20px;
+      border-radius: 8px;
+      border: 1px solid #c2e8e3;
+      background: linear-gradient(180deg, #fbfefe 0%, #f3fbfa 100%);
+    }
+    .flow-core .meta-icon {
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 6px;
+      background: #e6fbf7;
+      color: #0f766e;
+      margin-top: 2px;
+    }
+    .flow-core-title {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #143f3a;
+      line-height: 1.45;
+    }
+    .flow-core-desc {
+      display: block;
+      font-size: 0.86rem;
+      line-height: 1.75;
+      color: #486460;
+    }
     .card-links {
       display: flex;
       gap: 8px;
@@ -513,6 +547,10 @@
       main { padding: 40px 0 60px; }
       .container { padding: 0 16px; }
       .card-body { padding: 22px 18px 20px; }
+      .flow-core {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
     }
   </style>
 </head>
@@ -677,11 +715,12 @@
           <p class="card-desc">
             面向科技文献中的复杂表格数据，整体流程以论文 PDF、实验记录和观测数据为数据基础，先进行自定义表格结构识别与解析，将非结构化或半结构化表格恢复为可计算、可追踪的数据对象，再支撑表格语义理解与推理。
           </p>
-          <div class="card-meta">
-            <div class="meta-row">
-              <span class="meta-icon">▦</span>
-              <span>自定义表格结构识别与解析 · 表格区域、行列结构、合并单元格、层级表头、单位和注释</span>
-            </div>
+          <div class="flow-core">
+            <span class="meta-icon">▦</span>
+            <span>
+              <span class="flow-core-title">自定义表格结构识别与解析</span>
+              <span class="flow-core-desc">识别表格区域、行列结构、合并单元格、层级表头、单位和注释，将科技文献中的复杂表格恢复为可计算、可追踪的数据对象。</span>
+            </span>
           </div>
           <div class="feature-grid feature-grid-balanced">
             <div class="feature-panel">
